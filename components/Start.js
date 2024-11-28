@@ -79,7 +79,6 @@ const styles = StyleSheet.create({
     textInput: {
         fontSize: 16,
         fontWeight: 300,
-        color: '#757083',
         opacity: 0.5,
         padding: 12,
         borderWidth: 2,
