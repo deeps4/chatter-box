@@ -1,14 +1,16 @@
 import { GiftedChat, Bubble, Time } from "react-native-gifted-chat";
 import { useEffect, useState } from "react";
 import { View, StyleSheet, Platform, KeyboardAvoidingView } from "react-native";
-import placeholderAvatar from '../assets/placeholder-avatar.png'
+import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore";
 
-const Chat = ({ route, navigation }) => {
-    const { name, bgColor } = route.params
+const Chat = ({ route, navigation, db }) => {
+    const { name, bgColor, userId } = route.params
     const [messages, setMessages] = useState([]);
 
     const onSend = (newMessages) => {
-        setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages))
+        const messagesCollection = collection(db, 'messages');
+
+        addDoc(messagesCollection, newMessages[0]);
     }
 
     const renderTime = (timeProps) => {
@@ -26,7 +28,6 @@ const Chat = ({ route, navigation }) => {
     }
 
     const renderMessageBubble = (props) => {
-        console.log(props);
         return <Bubble {...props}
             renderTime={renderTime}
             textStyle={{
@@ -48,27 +49,35 @@ const Chat = ({ route, navigation }) => {
         // Update screen title with the given.
         navigation.setOptions({ title: name })
 
-        // Adding a dummy message just to check on the chat screen.
-        setMessages([
-            {
-                _id: 1,
-                text: "Hello developer",
-                createdAt: new Date(),
-                user: {
-                    _id: 2,
-                    name: "React Native",
-                    avatar: placeholderAvatar,
-                },
-            },
-            {
-                _id: 2,
-                text: 'This is a system message',
-                createdAt: new Date(),
-                system: true,
-            },
-        ]);
-
     }, []);
+
+    useEffect(() => {
+        const messagesQuery = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
+
+        // Listen to messages update in DB and set messages in component state.
+        // Also define unsubscribe variable which is returned by onSnapshot.
+        const unsubscribeToMessage = onSnapshot(messagesQuery, (updatedMessages) => {
+            const messageList = [];
+
+            // Loop on updatedMessages to access data from each messageObj using .data.
+            updatedMessages.forEach((messageObj) => {
+                const data = messageObj.data()
+
+                // Update createdAt date to date object which GiftedChat can understand.
+                messageList.push({ ...data, createdAt: data.createdAt.toDate() })
+            })
+
+            // Set messages in state so those can be passed in GiftedChat
+            setMessages(messageList);
+        })
+
+
+        // unsubscribe from message collection listin on cleanup (component unmount)
+        return () => {
+            // Check if unsubscribeToMessage is present before calling.
+            if (unsubscribeToMessage) unsubscribeToMessage();
+        }
+    }, [])
 
     return (
         <View style={styles.container} backgroundColor={bgColor}>
@@ -76,7 +85,8 @@ const Chat = ({ route, navigation }) => {
                 messages={messages}
                 onSend={onSend}
                 user={{
-                    _id: 1
+                    _id: userId,
+                    name,
                 }}
                 renderBubble={renderMessageBubble}
             />

@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, View, ImageBackground, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TextInput, View, ImageBackground, FlatList, TouchableOpacity, Alert } from "react-native";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 // Image to display in the background
 import homeImage from '../assets/home-image.png';
 
 // Getting navigation object in props, passed from NavigationStack.
 const Start = ({ navigation }) => {
+    const auth = getAuth();
     const [name, setName] = useState('');
     const [bgColor, setBgColor] = useState('');
 
@@ -13,6 +15,16 @@ const Start = ({ navigation }) => {
     const colors = ['#090C08', '#474056', '#8A95A5', '#B9C6AE']
 
     const shouldDisableChatBtn = !name || !bgColor;
+
+    const handleChatBtnClick = () => {
+        // Allow Anonymous sign in and navigate to Chat screen
+        signInAnonymously(auth).then((result) => {
+            navigation.navigate('Chat', { name, bgColor, userId: result.user.uid });
+        }).catch(() => {
+            // Show Alert when sign in fail.
+            Alert.alert('Unable to login. Please try later!')
+        })
+    }
 
     return (
         <View style={styles.container}>
@@ -49,9 +61,7 @@ const Start = ({ navigation }) => {
                         style={shouldDisableChatBtn ? styles.disabledBtn : {}}
                         // Disable button when name or bgColor is not selected
                         disabled={shouldDisableChatBtn}
-                        onPress={() => {
-                            navigation.navigate('Chat', { name, bgColor })
-                        }}>
+                        onPress={handleChatBtnClick}>
                         <Text style={styles.submitBtn}>Start Chatting</Text>
                     </TouchableOpacity>
                 </View>
