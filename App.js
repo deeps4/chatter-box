@@ -31,9 +31,11 @@ const App = () => {
 
   useEffect(() => {
     if (connectionStatus.isConnected === false) {
+      // Show alert and disabled firestore network when user is offline.
       Alert.alert("Connection Lost!")
       disableNetwork(db)
     } else if (connectionStatus.isConnected === true) {
+      // Enable firestore network when user is online.
       enableNetwork(db)
     }
   }, [connectionStatus.isConnected])

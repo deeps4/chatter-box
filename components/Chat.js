@@ -48,11 +48,13 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     }
 
     const renderInputToolbar = (props) => {
+        // Show Input message toolbar only when user is online.
         if (isConnected) return <InputToolbar {...props} />;
         else return null;
     }
 
 
+    // Store messages in device using AsyncStorage
     const storeMessages = async (messageList) => {
         try {
             await AsyncStorage.setItem('messages', JSON.stringify(messageList))
@@ -61,6 +63,7 @@ const Chat = ({ route, navigation, db, isConnected }) => {
         }
     }
 
+    // Load messages from AsyncStorage and set in component state.
     const loadMessagesFromStorage = async () => {
         try {
             const messagesFromStorage = await AsyncStorage.getItem('messages');
@@ -98,12 +101,14 @@ const Chat = ({ route, navigation, db, isConnected }) => {
                     messageList.push({ ...data, createdAt: data.createdAt.toDate() })
                 })
 
-                // Set messages in state so those can be passed in GiftedChat
+                // Store messages in device storage so that it can be used when user is offline.
                 storeMessages(messageList);
+
+                // Set messages in state so those can be passed in GiftedChat
                 setMessages(messageList);
             })
         } else {
-            // pick messages from AsyncStorage
+            // load messages from device storage
             loadMessagesFromStorage();
         }
 
