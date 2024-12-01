@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, View, ImageBackground, FlatList, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, Text, TextInput, View, ImageBackground, FlatList, TouchableOpacity, Alert, Platform, KeyboardAvoidingView } from "react-native";
 import { getAuth, signInAnonymously } from "firebase/auth";
 
 // Image to display in the background
@@ -66,6 +66,8 @@ const Start = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </ImageBackground>
+            {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
+            {Platform.OS === "ios" ? <KeyboardAvoidingView behavior="padding" /> : null}
         </View>
     )
 }
