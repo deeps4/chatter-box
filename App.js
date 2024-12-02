@@ -8,19 +8,22 @@ import { useNetInfo } from '@react-native-community/netinfo';
 import { useEffect } from 'react';
 import { Alert } from 'react-native';
 
+
+
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   const connectionStatus = useNetInfo();
 
+
   // Your web app's Firebase configuration
   const firebaseConfig = {
-    apiKey: "AIzaSyBdkcyaBbBOhGbiTxRI5DebeNIg2nuphSQ",
-    authDomain: "chatterbox-32799.firebaseapp.com",
-    projectId: "chatterbox-32799",
-    storageBucket: "chatterbox-32799.firebasestorage.app",
-    messagingSenderId: "338195724375",
-    appId: "1:338195724375:web:4ffe239dc8785fdba10b12"
+    apiKey: "AIzaSyDP4gCI40psjlwlztgpYmm_UzETTXEmf8o",
+    authDomain: "chatter-box-2ae0a.firebaseapp.com",
+    projectId: "chatter-box-2ae0a",
+    storageBucket: "chatter-box-2ae0a.firebasestorage.app",
+    messagingSenderId: "1031412477150",
+    appId: "1:1031412477150:web:ce55d4cab0ca2a273ea64f"
   };
 
   // Initialize Firebase
