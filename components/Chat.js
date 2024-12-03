@@ -155,7 +155,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
                 renderCustomView={renderCustomView}
             />
             {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
-            {Platform.OS === "ios" ? <KeyboardAvoidingView keyboardVerticalOffset={-210} behavior="padding" /> : null}
+            {Platform.OS === "ios" ? <KeyboardAvoidingView keyboardVerticalOffset={-250} behavior="padding" /> : null}
         </View>
     )
 }
