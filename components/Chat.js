@@ -1,10 +1,12 @@
 import { GiftedChat, Bubble, Time, InputToolbar } from "react-native-gifted-chat";
 import { useEffect, useState } from "react";
-import { View, StyleSheet, Platform, KeyboardAvoidingView } from "react-native";
+import { View, StyleSheet, Platform, KeyboardAvoidingView, Button, TouchableOpacity, Text } from "react-native";
 import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from "./CustomActions";
+import MapView from "react-native-maps";
 
-const Chat = ({ route, navigation, db, isConnected }) => {
+const Chat = ({ route, navigation, db, isConnected, storage }) => {
     const { name, bgColor, userId } = route.params;
 
     const [messages, setMessages] = useState([]);
@@ -51,6 +53,25 @@ const Chat = ({ route, navigation, db, isConnected }) => {
         // Show Input message toolbar only when user is online.
         if (isConnected) return <InputToolbar {...props} />;
         else return null;
+    }
+
+    const renderActionSheet = (props) => {
+        return <CustomActions storage={storage} userId={userId} {...props} />
+    }
+
+    const renderCustomView = ({ currentMessage }) => {
+        if (currentMessage.location) {
+            // Display custom map view with current message location
+            return <MapView
+                style={styles.mapMessage}
+                region={{
+                    latitude: currentMessage.location.latitude,
+                    longitude: currentMessage.location.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }} />
+        }
+        return null;
     }
 
 
@@ -130,9 +151,11 @@ const Chat = ({ route, navigation, db, isConnected }) => {
                 }}
                 renderBubble={renderMessageBubble}
                 renderInputToolbar={renderInputToolbar}
+                renderActions={renderActionSheet}
+                renderCustomView={renderCustomView}
             />
             {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
-            {Platform.OS === "ios" ? <KeyboardAvoidingView behavior="padding" /> : null}
+            {Platform.OS === "ios" ? <KeyboardAvoidingView keyboardVerticalOffset={-210} behavior="padding" /> : null}
         </View>
     )
 }
@@ -140,6 +163,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
+    mapMessage: {
+        width: 150,
+        height: 100,
+        borderRadius: 13,
+        margin: 3
+    }
 })
 
 export default Chat;
