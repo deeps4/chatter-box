@@ -5,6 +5,7 @@ import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firesto
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomActions from "./CustomActions";
 import MapView from "react-native-maps";
+import { v4 as uuidv4 } from 'uuid';
 
 const Chat = ({ route, navigation, db, isConnected, storage }) => {
     const { name, bgColor, userId } = route.params;
@@ -55,8 +56,25 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
         else return null;
     }
 
+    const handleMessageFromCustomActions = (message) => {
+        onSend([{
+            ...message,
+            _id: uuidv4(),
+            createdAt: new Date(),
+            user: {
+                _id: userId,
+                name: name
+            }
+        }])
+    }
+
     const renderActionSheet = (props) => {
-        return <CustomActions storage={storage} userId={userId} {...props} />
+        return <CustomActions
+            {...props}
+            storage={storage}
+            userId={userId}
+            onSend={handleMessageFromCustomActions}
+        />
     }
 
     const renderCustomView = ({ currentMessage }) => {
